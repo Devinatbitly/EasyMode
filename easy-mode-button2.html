@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easy Mode Toggle</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+            font-family: 'Bitly Displaay Standard', 'Work Sans', sans-serif;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: clamp(15px, 4vw, 30px);
+            position: relative;
+            padding: 20px;
+        }
+
+        .confetti {
+            position: absolute;
+            width: clamp(8px, 2vw, 14px);
+            height: clamp(12px, 3vw, 20px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .squiggle {
+            position: absolute;
+            width: clamp(30px, 8vw, 60px);
+            height: clamp(30px, 8vw, 60px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .squiggle svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .toggle-container.celebrating .confetti,
+        .toggle-container.celebrating .squiggle {
+            animation: confettiFall 1.4s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) rotate(var(--rotation));
+            }
+        }
+
+        .confetti:nth-child(1) {
+            top: 30%;
+            left: 20%;
+            background: #4FCAFF;
+            --tx: -140px;
+            --ty: -160px;
+            --rotation: 180deg;
+        }
+
+        .confetti:nth-child(2) {
+            top: 30%;
+            left: 80%;
+            background: #F36600;
+            --tx: 140px;
+            --ty: -150px;
+            --rotation: -160deg;
+        }
+
+        .confetti:nth-child(3) {
+            top: 70%;
+            left: 35%;
+            background: #031F39;
+            --tx: -120px;
+            --ty: 140px;
+            --rotation: 200deg;
+        }
+
+        .confetti:nth-child(4) {
+            top: 70%;
+            left: 65%;
+            background: #4FCAFF;
+            --tx: 120px;
+            --ty: 130px;
+            --rotation: -140deg;
+        }
+
+        .confetti:nth-child(5) {
+            top: 20%;
+            left: 25%;
+            background: #F36600;
+            --tx: -90px;
+            --ty: -180px;
+            --rotation: 220deg;
+        }
+
+        .confetti:nth-child(6) {
+            top: 20%;
+            left: 75%;
+            background: #031F39;
+            --tx: 90px;
+            --ty: -170px;
+            --rotation: -190deg;
+        }
+
+        .confetti:nth-child(7) {
+            top: 40%;
+            left: 85%;
+            background: #4FCAFF;
+            --tx: 160px;
+            --ty: -80px;
+            --rotation: 170deg;
+        }
+
+        .confetti:nth-child(8) {
+            top: 40%;
+            left: 15%;
+            background: #F36600;
+            --tx: -160px;
+            --ty: -70px;
+            --rotation: -210deg;
+        }
+
+        .confetti:nth-child(9) {
+            top: 10%;
+            left: 50%;
+            background: #031F39;
+            --tx: 0px;
+            --ty: -200px;
+            --rotation: 190deg;
+        }
+
+        .confetti:nth-child(10) {
+            top: 60%;
+            left: 40%;
+            background: #4FCAFF;
+            --tx: -80px;
+            --ty: 120px;
+            --rotation: -170deg;
+        }
+
+        .confetti:nth-child(11) {
+            top: 60%;
+            left: 60%;
+            background: #F36600;
+            --tx: 80px;
+            --ty: 110px;
+            --rotation: 200deg;
+        }
+
+        .confetti:nth-child(12) {
+            top: 35%;
+            left: 70%;
+            background: #031F39;
+            --tx: 140px;
+            --ty: -60px;
+            --rotation: -150deg;
+        }
+
+        .confetti:nth-child(13) {
+            top: 35%;
+            left: 30%;
+            background: #4FCAFF;
+            --tx: -140px;
+            --ty: -50px;
+            --rotation: 210deg;
+        }
+
+        .confetti:nth-child(14) {
+            top: 50%;
+            left: 90%;
+            background: #F36600;
+            --tx: 170px;
+            --ty: 20px;
+            --rotation: -180deg;
+        }
+
+        .confetti:nth-child(15) {
+            top: 50%;
+            left: 10%;
+            background: #031F39;
+            --tx: -170px;
+            --ty: 10px;
+            --rotation: 160deg;
+        }
+
+        .confetti:nth-child(16) {
+            top: 25%;
+            left: 90%;
+            background: #4FCAFF;
+            --tx: 150px;
+            --ty: -120px;
+            --rotation: -220deg;
+        }
+
+        .confetti:nth-child(17) {
+            top: 25%;
+            left: 10%;
+            background: #F36600;
+            --tx: -150px;
+            --ty: -130px;
+            --rotation: 195deg;
+        }
+
+        .confetti:nth-child(18) {
+            top: 80%;
+            left: 58%;
+            background: #031F39;
+            --tx: 60px;
+            --ty: 150px;
+            --rotation: -165deg;
+        }
+
+        .confetti:nth-child(19) {
+            top: 80%;
+            left: 42%;
+            background: #4FCAFF;
+            --tx: -60px;
+            --ty: 160px;
+            --rotation: 175deg;
+        }
+
+        .confetti:nth-child(20) {
+            top: 45%;
+            left: 78%;
+            background: #F36600;
+            --tx: 130px;
+            --ty: -40px;
+            --rotation: -200deg;
+        }
+
+        .confetti:nth-child(21) {
+            top: 45%;
+            left: 22%;
+            background: #031F39;
+            --tx: -130px;
+            --ty: -30px;
+            --rotation: 185deg;
+        }
+
+        .confetti:nth-child(22) {
+            top: 65%;
+            left: 62%;
+            background: #4FCAFF;
+            --tx: 100px;
+            --ty: 100px;
+            --rotation: -175deg;
+        }
+
+        .confetti:nth-child(23) {
+            top: 65%;
+            left: 38%;
+            background: #F36600;
+            --tx: -100px;
+            --ty: 90px;
+            --rotation: 215deg;
+        }
+
+        .confetti:nth-child(24) {
+            top: 90%;
+            left: 50%;
+            background: #031F39;
+            --tx: 0px;
+            --ty: 180px;
+            --rotation: -155deg;
+        }
+
+        .squiggle:nth-child(25) {
+            top: 20%;
+            left: 30%;
+            --tx: -100px;
+            --ty: -140px;
+            --rotation: 190deg;
+        }
+
+        .squiggle:nth-child(26) {
+            top: 20%;
+            left: 70%;
+            --tx: 100px;
+            --ty: -130px;
+            --rotation: -180deg;
+        }
+
+        .squiggle:nth-child(27) {
+            top: 50%;
+            left: 15%;
+            --tx: -140px;
+            --ty: 0px;
+            --rotation: 200deg;
+        }
+
+        .squiggle:nth-child(28) {
+            top: 50%;
+            left: 85%;
+            --tx: 140px;
+            --ty: 10px;
+            --rotation: -170deg;
+        }
+
+        .squiggle:nth-child(29) {
+            top: 70%;
+            left: 25%;
+            --tx: -90px;
+            --ty: 120px;
+            --rotation: 210deg;
+        }
+
+        .squiggle:nth-child(30) {
+            top: 70%;
+            left: 75%;
+            --tx: 90px;
+            --ty: 110px;
+            --rotation: -160deg;
+        }
+
+        .squiggle:nth-child(31) {
+            top: 35%;
+            left: 50%;
+            --tx: 0px;
+            --ty: -150px;
+            --rotation: 185deg;
+        }
+
+        .squiggle:nth-child(32) {
+            top: 80%;
+            left: 50%;
+            --tx: 0px;
+            --ty: 140px;
+            --rotation: -195deg;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: clamp(120px, 25vw, 200px);
+            height: clamp(60px, 12.5vw, 100px);
+            background: #cccccc;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch.active {
+            background: #F36600;
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: clamp(4px, 1vw, 6px);
+            left: clamp(4px, 1vw, 6px);
+            width: clamp(48px, 10vw, 80px);
+            height: clamp(48px, 10vw, 80px);
+            background: radial-gradient(circle at 29% 65%, #FFFDF8 30%, #F9F7EE 50%, #F3F0E6 65%, #EEEAE3 80%);
+            border-radius: 50%;
+            border: 4px solid #FFFDF8;
+            transition: transform 0.3s ease;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(clamp(60px, 12.5vw, 100px));
+        }
+
+        .toggle-label {
+            font-size: clamp(32px, 8vw, 72px);
+            font-weight: 500;
+            color: #000;
+            user-select: none;
+        }
+
+        .confetti-control {
+            position: fixed;
+            bottom: clamp(10px, 2vh, 20px);
+            right: clamp(10px, 2vw, 20px);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: clamp(12px, 2vw, 14px);
+            color: #666;
+        }
+
+        .confetti-toggle {
+            width: clamp(40px, 8vw, 50px);
+            height: clamp(21px, 4.2vw, 26px);
+            background: #cccccc;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            position: relative;
+        }
+
+        .confetti-toggle.active {
+            background: #4FCAFF;
+        }
+
+        .confetti-toggle-knob {
+            position: absolute;
+            top: clamp(2px, 0.5vw, 3px);
+            left: clamp(2px, 0.5vw, 3px);
+            width: clamp(17px, 3.4vw, 20px);
+            height: clamp(17px, 3.4vw, 20px);
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .confetti-toggle.active .confetti-toggle-knob {
+            transform: translateX(clamp(19px, 3.8vw, 24px));
+        }
+
+        @media (max-width: 768px) {
+            .toggle-container {
+                flex-direction: column;
+                gap: clamp(20px, 5vw, 30px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toggle-container" id="toggleContainer">
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="confetti"></div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M10 30 Q 25 15, 40 30 T 50 30" fill="none" stroke="#4FCAFF" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M10 30 Q 25 45, 40 30 T 50 30" fill="none" stroke="#F36600" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M30 10 Q 15 25, 30 40 T 30 50" fill="none" stroke="#031F39" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M30 10 Q 45 25, 30 40 T 30 50" fill="none" stroke="#4FCAFF" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M15 15 Q 30 25, 40 40 T 45 45" fill="none" stroke="#F36600" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M45 15 Q 30 25, 20 40 T 15 45" fill="none" stroke="#031F39" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M10 35 Q 20 20, 35 25 T 50 30" fill="none" stroke="#4FCAFF" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="squiggle">
+            <svg viewBox="0 0 60 60"><path d="M10 25 Q 20 40, 35 35 T 50 30" fill="none" stroke="#F36600" stroke-width="5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="toggle-switch" id="toggleSwitch">
+            <div class="toggle-knob"></div>
+        </div>
+        <div class="toggle-label">Easy mode</div>
+    </div>
+
+    <div class="confetti-control">
+        <span>Confetti</span>
+        <div class="confetti-toggle active" id="confettiToggle">
+            <div class="confetti-toggle-knob"></div>
+        </div>
+    </div>
+
+    <script>
+        const toggleSwitch = document.getElementById('toggleSwitch');
+        const toggleContainer = document.getElementById('toggleContainer');
+        const confettiToggle = document.getElementById('confettiToggle');
+        let isActive = false;
+        let confettiEnabled = true;
+
+        // Create audio context for whoosh sound
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playWhooshSound() {
+            const bufferSize = audioContext.sampleRate * 0.4;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            // Generate noise with envelope
+            for (let i = 0; i < bufferSize; i++) {
+                const t = i / bufferSize;
+                const envelope = Math.sin(t * Math.PI) * Math.exp(-t * 3);
+                data[i] = (Math.random() * 2 - 1) * envelope;
+            }
+            
+            const source = audioContext.createBufferSource();
+            const filter = audioContext.createBiquadFilter();
+            const gainNode = audioContext.createGain();
+            
+            filter.type = 'bandpass';
+            
+            source.buffer = buffer;
+            source.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Sweep the filter for whoosh effect (ascending)
+            filter.frequency.setValueAtTime(300, audioContext.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(2000, audioContext.currentTime + 0.4);
+            filter.Q.value = 3;
+            
+            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
+            
+            source.start(audioContext.currentTime);
+        }
+
+        confettiToggle.addEventListener('click', function() {
+            confettiEnabled = !confettiEnabled;
+            confettiToggle.classList.toggle('active');
+        });
+
+        toggleSwitch.addEventListener('click', function() {
+            isActive = !isActive;
+            
+            if (isActive) {
+                playWhooshSound();
+                toggleSwitch.classList.add('active');
+                
+                // Trigger celebration animation only if confetti is enabled
+                if (confettiEnabled) {
+                    toggleContainer.classList.remove('celebrating');
+                    void toggleContainer.offsetWidth; // Trigger reflow
+                    toggleContainer.classList.add('celebrating');
+                }
+            } else {
+                toggleSwitch.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
