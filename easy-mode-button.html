@@ -511,7 +511,12 @@
         // Create audio context for whoosh sound
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-        function playWhooshSound() {
+        async function playWhooshSound() {
+            // Resume audio context on mobile (required for iOS)
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+            
             const bufferSize = audioContext.sampleRate * 0.4;
             const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
             const data = buffer.getChannelData(0);
