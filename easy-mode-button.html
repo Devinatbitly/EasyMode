@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv='cache-control' content='no-cache'> 
     <meta http-equiv='expires' content='0'> 
     <meta http-equiv='pragma' content='no-cache'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easy Mode</title>
     <style>
 
@@ -434,6 +434,7 @@
         }
 
         .confetti-control {
+            display: none;
             position: fixed;
             bottom: clamp(10px, 2vh, 20px);
             right: clamp(10px, 2vw, 20px);
@@ -445,6 +446,7 @@
         }
 
         .confetti-toggle {
+            display: none;
             width: clamp(40px, 8vw, 50px);
             height: clamp(21px, 4.2vw, 26px);
             background: #cccccc;
@@ -543,7 +545,7 @@
         <div class="toggle-label">Easy mode</div>
     </div>
 
-    <div style="display:none;" class="confetti-control">
+    <div class="confetti-control">
         <span>Confetti</span>
         <div class="confetti-toggle active" id="confettiToggle">
             <div class="confetti-toggle-knob"></div>
