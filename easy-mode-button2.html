@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Mode Toggle</title>
+    <title>Activate Easy Mode</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap');
 
@@ -345,8 +345,8 @@
 
         .toggle-switch {
             position: relative;
-            width: clamp(120px, 25vw, 200px);
-            height: clamp(60px, 12.5vw, 100px);
+            width: clamp(130px, 26vw, 200px);
+            height: clamp(65px, 13vw, 100px);
             background: #cccccc;
             border-radius: 50px;
             cursor: pointer;
@@ -360,8 +360,9 @@
 
         .toggle-knob {
             position: absolute;
-            top: clamp(4px, 1vw, 6px);
-            left: clamp(4px, 1vw, 6px);
+            top: 50%;
+            left: clamp(6px, 1.2vw, 8px);
+            transform: translateY(-50%);
             width: clamp(48px, 10vw, 80px);
             height: clamp(48px, 10vw, 80px);
             background: radial-gradient(circle at 29% 65%, #FFFDF8 30%, #F9F7EE 50%, #F3F0E6 65%, #EEEAE3 80%);
@@ -373,7 +374,7 @@
         }
 
         .toggle-switch.active .toggle-knob {
-            transform: translateX(clamp(60px, 12.5vw, 100px));
+            transform: translateX(clamp(65px, 13vw, 96px)) translateY(-50%);
         }
 
         .toggle-label {
@@ -425,6 +426,11 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding-top: 15vh;
+            }
+
             .toggle-container {
                 flex-direction: column;
                 gap: clamp(20px, 5vw, 30px);
