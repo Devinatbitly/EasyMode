@@ -3,8 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activate Easy Mode</title>
+    <title>Easy Mode</title>
     <style>
+
+@font-face {
+    font-family: "Bitly Display Light";
+    src: url("https://mkt-static.bitly.com/static/1760393911/pages/wp-content/themes/JointsWP-CSS-master/assets/fonts/bitly_displaay_standard/BitlyDisplaayStandard-Light.woff") format("woff");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 300;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "Bitly Display Regular";
+    src: url("https://mkt-static.bitly.com/static/1760393911/pages/wp-content/themes/JointsWP-CSS-master/assets/fonts/bitly_displaay_standard/BitlyDisplaayStandard-Regular.woff") format("woff");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "Bitly Display Medium";
+    src: url("https://mkt-static.bitly.com/static/1760393911/pages/wp-content/themes/JointsWP-CSS-master/assets/fonts/bitly_displaay_standard/BitlyDisplaayStandard-SemiBold.woff") format("woff");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 600;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "Bitly Display Bold";
+    src: url("https://mkt-static.bitly.com/static/1760393911/pages/wp-content/themes/JointsWP-CSS-master/assets/fonts/bitly_displaay_standard/BitlyDisplaayStandard-Bold.woff") format("woff");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 700;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "Bitly Display ExtraBold";
+    src: url("https://mkt-static.bitly.com/static/1760393911/pages/wp-content/themes/JointsWP-CSS-master/assets/fonts/bitly_displaay_standard/BitlyDisplaayStandard-Heavy.woff") format("woff");
+    font-display: swap;
+    font-style: normal;
+    font-weight: 800;
+    font-stretch: normal;
+}
+        
         @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap');
 
         body {
@@ -15,7 +61,7 @@
             justify-content: center;
             align-items: center;
             background: #ffffff;
-            font-family: 'Bitly Displaay Standard', 'Work Sans', sans-serif;
+            font-family: 'Bitly Display Medium', 'Work Sans', sans-serif;
         }
 
         .toggle-container {
@@ -361,7 +407,7 @@
         .toggle-knob {
             position: absolute;
             top: 50%;
-            left: clamp(5px, 1.2vw, 8px);
+            left: clamp(4px, 1.2vw, 7px);
             transform: translateY(-50%);
             width: clamp(48px, 10vw, 80px);
             height: clamp(48px, 10vw, 80px);
@@ -374,7 +420,7 @@
         }
 
         .toggle-switch.active .toggle-knob {
-            transform: translateX(clamp(65px, 13vw, 96px)) translateY(-50%);
+            transform: translateX(clamp(64px, 13vw, 96px)) translateY(-50%);
         }
 
         .toggle-label {
@@ -501,53 +547,88 @@
         </div>
     </div>
 
-    <script>
+   <script>
         const toggleSwitch = document.getElementById('toggleSwitch');
         const toggleContainer = document.getElementById('toggleContainer');
         const confettiToggle = document.getElementById('confettiToggle');
         let isActive = false;
         let confettiEnabled = true;
 
-        // Create audio context for whoosh sound
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-        function playWhooshSound() {
-            const bufferSize = audioContext.sampleRate * 0.4;
-            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
-            
-            // Generate noise with envelope
-            for (let i = 0; i < bufferSize; i++) {
-                const t = i / bufferSize;
-                const envelope = Math.sin(t * Math.PI) * Math.exp(-t * 3);
-                data[i] = (Math.random() * 2 - 1) * envelope;
+        // Create audio context for whoosh sound (lazily initialized)
+        let audioContext = null;
+        
+        function initAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
-            
-            const source = audioContext.createBufferSource();
-            const filter = audioContext.createBiquadFilter();
-            const gainNode = audioContext.createGain();
-            
-            filter.type = 'bandpass';
-            
-            source.buffer = buffer;
-            source.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Sweep the filter for whoosh effect (ascending)
-            filter.frequency.setValueAtTime(300, audioContext.currentTime);
-            filter.frequency.exponentialRampToValueAtTime(2000, audioContext.currentTime + 0.4);
-            filter.Q.value = 3;
-            
-            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
-            
-            source.start(audioContext.currentTime);
+            return audioContext;
+        }
+
+        async function playWhooshSound() {
+            try {
+                // Initialize audio context on first use
+                const ctx = initAudioContext();
+                
+                // Resume audio context on mobile (required for iOS)
+                if (ctx.state === 'suspended') {
+                    await ctx.resume();
+                }
+                
+                const bufferSize = ctx.sampleRate * 0.4;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                // Generate noise with envelope
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / bufferSize;
+                    const envelope = Math.sin(t * Math.PI) * Math.exp(-t * 3);
+                    data[i] = (Math.random() * 2 - 1) * envelope;
+                }
+                
+                const source = ctx.createBufferSource();
+                const filter = ctx.createBiquadFilter();
+                const gainNode = ctx.createGain();
+                
+                filter.type = 'bandpass';
+                
+                source.buffer = buffer;
+                source.connect(filter);
+                filter.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                // Sweep the filter for whoosh effect (ascending)
+                filter.frequency.setValueAtTime(300, ctx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.4);
+                filter.Q.value = 3;
+                
+                gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
+                
+                source.start(ctx.currentTime);
+            } catch (error) {
+                console.log('Audio playback failed:', error);
+            }
         }
 
         confettiToggle.addEventListener('click', function() {
             confettiEnabled = !confettiEnabled;
             confettiToggle.classList.toggle('active');
         });
+
+        // Unlock audio on first user interaction (important for mobile)
+        let audioUnlocked = false;
+        function unlockAudio() {
+            if (!audioUnlocked) {
+                const ctx = initAudioContext();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                audioUnlocked = true;
+            }
+        }
+
+        // Listen for first touch/click to unlock audio
+        document.addEventListener('touchstart', unlockAudio, { once: true });
+        document.addEventListener('click', unlockAudio, { once: true });
 
         toggleSwitch.addEventListener('click', function() {
             isActive = !isActive;
