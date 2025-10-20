@@ -550,7 +550,7 @@
         </div>
     </div>
 
-   <script>
+<script>
         const toggleSwitch = document.getElementById('toggleSwitch');
         const toggleContainer = document.getElementById('toggleContainer');
         const confettiToggle = document.getElementById('confettiToggle');
@@ -569,10 +569,10 @@
 
         async function playWhooshSound() {
             try {
-                // Initialize audio context on first use
+                // Initialize and resume audio context within this user gesture
                 const ctx = initAudioContext();
                 
-                // Resume audio context on mobile (required for iOS)
+                // Critical for iOS: resume within the same user gesture
                 if (ctx.state === 'suspended') {
                     await ctx.resume();
                 }
@@ -617,27 +617,11 @@
             confettiToggle.classList.toggle('active');
         });
 
-        // Unlock audio on first user interaction (important for mobile)
-        let audioUnlocked = false;
-        function unlockAudio() {
-            if (!audioUnlocked) {
-                const ctx = initAudioContext();
-                if (ctx.state === 'suspended') {
-                    ctx.resume();
-                }
-                audioUnlocked = true;
-            }
-        }
-
-        // Listen for first touch/click to unlock audio
-        document.addEventListener('touchstart', unlockAudio, { once: true });
-        document.addEventListener('click', unlockAudio, { once: true });
-
-        toggleSwitch.addEventListener('click', function() {
+        toggleSwitch.addEventListener('click', async function() {
             isActive = !isActive;
             
             if (isActive) {
-                playWhooshSound();
+                await playWhooshSound();
                 toggleSwitch.classList.add('active');
                 
                 // Trigger celebration animation only if confetti is enabled
