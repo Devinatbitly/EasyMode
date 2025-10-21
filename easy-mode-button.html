@@ -547,7 +547,7 @@
     </div>
 
     <div class="confetti-control">
-        <!--<span>Confetti</span>--><span>v2.02</span>
+        <!--<span>Confetti</span>--><span>v2.03</span>
         <div class="confetti-toggle active" id="confettiToggle">
             <div class="confetti-toggle-knob"></div>
         </div>
@@ -578,13 +578,19 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-        function triggerHaptic(pattern) {
+       function triggerHaptic(pattern) {
             // For iOS 18+: Use the checkbox switch trick
             if (isIOS && hapticLabel) {
-                // Trigger multiple rapid clicks for stronger haptic
-                hapticLabel.click();
-                setTimeout(() => hapticLabel.click(), 10);
-                setTimeout(() => hapticLabel.click(), 20);
+                // Pattern 1 (ON) = stronger with multiple clicks
+                if (pattern === vibrationPattern1) {
+                    hapticLabel.click();
+                    setTimeout(() => hapticLabel.click(), 10);
+                    setTimeout(() => hapticLabel.click(), 20);
+                }
+                // Pattern 3 (OFF) = original single click
+                else {
+                    hapticLabel.click();
+                }
             } 
             // For Android and other devices: Use standard Vibration API
             else if ('vibrate' in navigator) {
