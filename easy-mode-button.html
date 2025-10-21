@@ -483,14 +483,13 @@
             }
 
             .toggle-container {
-                flex-direction: column;
+                flex-direction: column-reverse;
                 gap: clamp(20px, 5vw, 30px);
             }
         }
     </style>
 </head>
 <body>
- <!--   <script src="https://kbstt.github.io/pwa-demos/pwa-vibration-api.js?v=lfJmZ"></script> -->
     <div class="toggle-container" id="toggleContainer">
         <div class="confetti"></div>
         <div class="confetti"></div>
@@ -547,7 +546,7 @@
     </div>
 
     <div class="confetti-control">
-        <!--<span>Confetti</span>--><span>v2.03</span>
+        <!--<span>Confetti</span>--><span>v2.05</span>
         <div class="confetti-toggle active" id="confettiToggle">
             <div class="confetti-toggle-knob"></div>
         </div>
@@ -578,14 +577,37 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-       function triggerHaptic(pattern) {
+function triggerHaptic(pattern) {
             // For iOS 18+: Use the checkbox switch trick
             if (isIOS && hapticLabel) {
-                // Pattern 1 (ON) = stronger with multiple clicks
+                // Pattern 1 (ON) = initial pulse + pause + fireworks
                 if (pattern === vibrationPattern1) {
+                    // Initial "turn on" confirmation - quick double tap
                     hapticLabel.click();
-                    setTimeout(() => hapticLabel.click(), 10);
-                    setTimeout(() => hapticLabel.click(), 20);
+                    setTimeout(() => hapticLabel.click(), 15);
+                    
+                    // PAUSE before fireworks (200ms)
+                    
+                    // Fireworks celebration starts
+                    setTimeout(() => hapticLabel.click(), 220);
+                    setTimeout(() => hapticLabel.click(), 235);
+                    setTimeout(() => hapticLabel.click(), 255);
+                    
+                    // Scattered bursts (irregular timing like real fireworks)
+                    setTimeout(() => hapticLabel.click(), 310);
+                    setTimeout(() => hapticLabel.click(), 365);
+                    setTimeout(() => hapticLabel.click(), 395);
+                    setTimeout(() => hapticLabel.click(), 450);
+                    setTimeout(() => hapticLabel.click(), 500);
+                    setTimeout(() => hapticLabel.click(), 550);
+                    setTimeout(() => hapticLabel.click(), 610);
+                    setTimeout(() => hapticLabel.click(), 650);
+                    setTimeout(() => hapticLabel.click(), 705);
+                    setTimeout(() => hapticLabel.click(), 760);
+                    
+                    // Final sparkles
+                    setTimeout(() => hapticLabel.click(), 840);
+                    setTimeout(() => hapticLabel.click(), 895);
                 }
                 // Pattern 3 (OFF) = original single click
                 else {
