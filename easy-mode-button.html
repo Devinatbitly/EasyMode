@@ -552,33 +552,87 @@
         </div>
     </div>
 
-<script>
+   <!-- Hidden haptic trigger for iOS 18+ -->
+    <input type="checkbox" switch id="hapticTrigger" style="position: absolute; opacity: 0; pointer-events: none;">
+    <label for="hapticTrigger" id="hapticLabel" style="position: absolute; opacity: 0; pointer-events: none;"></label>
+
+   <script>
         const toggleSwitch = document.getElementById('toggleSwitch');
         const toggleContainer = document.getElementById('toggleContainer');
         const confettiToggle = document.getElementById('confettiToggle');
+        const hapticLabel = document.getElementById('hapticLabel');
+        const hapticTrigger = document.getElementById('hapticTrigger');
         let isActive = false;
         let confettiEnabled = true;
-
-        // Create audio context for whoosh sound (lazily initialized)
         let audioContext = null;
-        
-        function initAudioContext() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let audioReady = false;
+
+        // Vibration patterns (in milliseconds)
+        // Pattern 1 (ON): Quick single pulse
+        const vibrationPattern1 = [50];
+        // Pattern 3 (OFF): Single longer pulse
+        const vibrationPattern3 = [100];
+
+        // Detect iOS
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        function triggerHaptic(pattern) {
+            // For iOS 18+: Use the checkbox switch trick
+            if (isIOS && hapticLabel && hapticTrigger) {
+                // Trigger multiple clicks based on pattern
+                if (pattern.length === 1) {
+                    // Single pulse - one click
+                    hapticLabel.click();
+                } else {
+                    // Multiple pulses - multiple clicks with delays
+                    let delay = 0;
+                    for (let i = 0; i < pattern.length; i += 2) {
+                        setTimeout(() => {
+                            hapticLabel.click();
+                        }, delay);
+                        // Add vibration duration + pause duration
+                        delay += (pattern[i] || 0) + (pattern[i + 1] || 0);
+                    }
+                }
+            } 
+            // For Android and other devices: Use standard Vibration API
+            else if ('vibrate' in navigator) {
+                navigator.vibrate(pattern);
             }
-            return audioContext;
         }
 
-        async function playWhooshSound() {
-            try {
-                // Initialize and resume audio context within this user gesture
-                const ctx = initAudioContext();
-                
-                // Critical for iOS: resume within the same user gesture
-                if (ctx.state === 'suspended') {
-                    await ctx.resume();
+        function initAudio() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create a silent buffer to unlock audio on iOS
+                    const silentBuffer = audioContext.createBuffer(1, 1, 22050);
+                    const silentSource = audioContext.createBufferSource();
+                    silentSource.buffer = silentBuffer;
+                    silentSource.connect(audioContext.destination);
+                    silentSource.start(0);
+                    
+                    audioReady = true;
+                } catch (e) {
+                    console.log('Audio init failed:', e);
                 }
-                
+            }
+            
+            // Resume if suspended
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    audioReady = true;
+                });
+            }
+        }
+
+        function playWhooshSound() {
+            if (!audioContext || !audioReady) return;
+            
+            try {
+                const ctx = audioContext;
                 const bufferSize = ctx.sampleRate * 0.4;
                 const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
                 const data = buffer.getChannelData(0);
@@ -601,7 +655,7 @@
                 filter.connect(gainNode);
                 gainNode.connect(ctx.destination);
                 
-                // Sweep the filter for whoosh effect (ascending)
+                // Sweep the filter for whoosh effect
                 filter.frequency.setValueAtTime(300, ctx.currentTime);
                 filter.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.4);
                 filter.Q.value = 3;
@@ -619,23 +673,32 @@
             confettiToggle.classList.toggle('active');
         });
 
-        toggleSwitch.addEventListener('click', async function() {
+        toggleSwitch.addEventListener('click', function() {
+            // Initialize audio on first interaction
+            if (!audioContext) {
+                initAudio();
+            }
+            
             isActive = !isActive;
             
             if (isActive) {
-                await playWhooshSound();
+                triggerHaptic(vibrationPattern1); // Pattern 1 for ON
+                playWhooshSound();
                 toggleSwitch.classList.add('active');
                 
-                // Trigger celebration animation only if confetti is enabled
                 if (confettiEnabled) {
                     toggleContainer.classList.remove('celebrating');
-                    void toggleContainer.offsetWidth; // Trigger reflow
+                    void toggleContainer.offsetWidth;
                     toggleContainer.classList.add('celebrating');
                 }
             } else {
+                triggerHaptic(vibrationPattern3); // Pattern 3 for OFF
                 toggleSwitch.classList.remove('active');
             }
         });
+        
+        // Alternative: initialize on any touch/click (helps with iOS)
+        document.addEventListener('touchstart', initAudio, { once: true });
     </script>
 </body>
 </html>
