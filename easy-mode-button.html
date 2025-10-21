@@ -490,7 +490,7 @@
     </style>
 </head>
 <body>
-    <script src="https://kbstt.github.io/pwa-demos/pwa-vibration-api.js?v=lfJmZ"></script>
+ <!--   <script src="https://kbstt.github.io/pwa-demos/pwa-vibration-api.js?v=lfJmZ"></script> -->
     <div class="toggle-container" id="toggleContainer">
         <div class="confetti"></div>
         <div class="confetti"></div>
@@ -547,7 +547,7 @@
     </div>
 
     <div class="confetti-control">
-        <!--<span>Confetti</span>--><span>v2.01</span>
+        <!--<span>Confetti</span>--><span>v2.02</span>
         <div class="confetti-toggle active" id="confettiToggle">
             <div class="confetti-toggle-knob"></div>
         </div>
@@ -580,22 +580,11 @@
 
         function triggerHaptic(pattern) {
             // For iOS 18+: Use the checkbox switch trick
-            if (isIOS && hapticLabel && hapticTrigger) {
-                // Trigger multiple clicks based on pattern
-                if (pattern.length === 1) {
-                    // Single pulse - one click
-                    hapticLabel.click();
-                } else {
-                    // Multiple pulses - multiple clicks with delays
-                    let delay = 0;
-                    for (let i = 0; i < pattern.length; i += 2) {
-                        setTimeout(() => {
-                            hapticLabel.click();
-                        }, delay);
-                        // Add vibration duration + pause duration
-                        delay += (pattern[i] || 0) + (pattern[i + 1] || 0);
-                    }
-                }
+            if (isIOS && hapticLabel) {
+                // Trigger multiple rapid clicks for stronger haptic
+                hapticLabel.click();
+                setTimeout(() => hapticLabel.click(), 10);
+                setTimeout(() => hapticLabel.click(), 20);
             } 
             // For Android and other devices: Use standard Vibration API
             else if ('vibrate' in navigator) {
