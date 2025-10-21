@@ -556,7 +556,7 @@
     <input type="checkbox" switch id="hapticTrigger" style="position: absolute; opacity: 0; pointer-events: none;">
     <label for="hapticTrigger" id="hapticLabel" style="position: absolute; opacity: 0; pointer-events: none;"></label>
 
-   <script>
+  <script>
         const toggleSwitch = document.getElementById('toggleSwitch');
         const toggleContainer = document.getElementById('toggleContainer');
         const confettiToggle = document.getElementById('confettiToggle');
@@ -564,8 +564,6 @@
         const hapticTrigger = document.getElementById('hapticTrigger');
         let isActive = false;
         let confettiEnabled = true;
-        let audioContext = null;
-        let audioReady = false;
 
         // Vibration patterns (in milliseconds)
         // Pattern 1 (ON): Quick single pulse
@@ -577,7 +575,56 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-function triggerHaptic(pattern) {
+        function playVictorySound() {
+            try {
+                // Create audio context fresh each time for iOS compatibility
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Note frequencies (one octave higher - G5, A5, C6)
+                const G5 = 783.99;
+                const A5 = 880.00;
+                const C6 = 1046.50;
+                
+                // Note durations (faster tempo)
+                const quarter = 0.12;
+                const eighth = 0.06;
+                const half = 0.36;
+                
+                // Melody: G5-eighth, A5-eighth, C6-quarter
+                const melody = [
+                    { freq: G5, duration: eighth },
+                    { freq: A5, duration: eighth },
+                    { freq: C6, duration: quarter }
+                ];
+                
+                let currentTime = ctx.currentTime;
+                
+                melody.forEach((note) => {
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    
+                    oscillator.frequency.value = note.freq;
+                    oscillator.type = 'triangle';
+                    
+                    // Envelope for each note
+                    gainNode.gain.setValueAtTime(0, currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.2, currentTime + 0.01);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
+                    
+                    oscillator.start(currentTime);
+                    oscillator.stop(currentTime + note.duration);
+                    
+                    currentTime += note.duration;
+                });
+            } catch (error) {
+                console.log('Audio playback failed:', error);
+            }
+        }
+
+        function triggerHaptic(pattern) {
             // For iOS 18+: Use the checkbox switch trick
             if (isIOS && hapticLabel) {
                 // Pattern 1 (ON) = initial pulse + pause + fireworks
@@ -620,88 +667,17 @@ function triggerHaptic(pattern) {
             }
         }
 
-        function initAudio() {
-            if (!audioContext) {
-                try {
-                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    
-                    // Create a silent buffer to unlock audio on iOS
-                    const silentBuffer = audioContext.createBuffer(1, 1, 22050);
-                    const silentSource = audioContext.createBufferSource();
-                    silentSource.buffer = silentBuffer;
-                    silentSource.connect(audioContext.destination);
-                    silentSource.start(0);
-                    
-                    audioReady = true;
-                } catch (e) {
-                    console.log('Audio init failed:', e);
-                }
-            }
-            
-            // Resume if suspended
-            if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume().then(() => {
-                    audioReady = true;
-                });
-            }
-        }
-
-        function playWhooshSound() {
-            if (!audioContext || !audioReady) return;
-            
-            try {
-                const ctx = audioContext;
-                const bufferSize = ctx.sampleRate * 0.4;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                
-                // Generate noise with envelope
-                for (let i = 0; i < bufferSize; i++) {
-                    const t = i / bufferSize;
-                    const envelope = Math.sin(t * Math.PI) * Math.exp(-t * 3);
-                    data[i] = (Math.random() * 2 - 1) * envelope;
-                }
-                
-                const source = ctx.createBufferSource();
-                const filter = ctx.createBiquadFilter();
-                const gainNode = ctx.createGain();
-                
-                filter.type = 'bandpass';
-                
-                source.buffer = buffer;
-                source.connect(filter);
-                filter.connect(gainNode);
-                gainNode.connect(ctx.destination);
-                
-                // Sweep the filter for whoosh effect
-                filter.frequency.setValueAtTime(300, ctx.currentTime);
-                filter.frequency.exponentialRampToValueAtTime(2000, ctx.currentTime + 0.4);
-                filter.Q.value = 3;
-                
-                gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
-                
-                source.start(ctx.currentTime);
-            } catch (error) {
-                console.log('Audio playback failed:', error);
-            }
-        }
-
         confettiToggle.addEventListener('click', function() {
             confettiEnabled = !confettiEnabled;
             confettiToggle.classList.toggle('active');
         });
 
         toggleSwitch.addEventListener('click', function() {
-            // Initialize audio on first interaction
-            if (!audioContext) {
-                initAudio();
-            }
-            
             isActive = !isActive;
             
             if (isActive) {
-                triggerHaptic(vibrationPattern1); // Pattern 1 for ON
-                playWhooshSound();
+                triggerHaptic(vibrationPattern1); // Fireworks haptic for ON
+                playVictorySound(); // Victory fanfare
                 toggleSwitch.classList.add('active');
                 
                 if (confettiEnabled) {
@@ -710,13 +686,10 @@ function triggerHaptic(pattern) {
                     toggleContainer.classList.add('celebrating');
                 }
             } else {
-                triggerHaptic(vibrationPattern3); // Pattern 3 for OFF
+                triggerHaptic(vibrationPattern3); // Single pulse for OFF
                 toggleSwitch.classList.remove('active');
             }
         });
-        
-        // Alternative: initialize on any touch/click (helps with iOS)
-        document.addEventListener('touchstart', initAudio, { once: true });
     </script>
 </body>
 </html>
